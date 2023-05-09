@@ -1,5 +1,5 @@
 import * as React from 'react';
-import graph from './graph.json';
+import data from './data.json';
 
 import { StyleSheet, View } from 'react-native';
 import VisNetwork from 'react-native-vis-network';
@@ -7,7 +7,6 @@ import VisNetwork from 'react-native-vis-network';
 const accent = '#8944AB';
 
 export default function App() {
-  const { edges, nodes } = graph;
   const options = {
     edges: {
       color: accent,
@@ -32,8 +31,7 @@ export default function App() {
       <View style={styles.container}>
         <VisNetwork
           containerStyle={styles.networkContainer}
-          edges={edges}
-          nodes={nodes}
+          data={data}
           options={options}
         />
       </View>

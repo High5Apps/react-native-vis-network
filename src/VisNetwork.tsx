@@ -6,19 +6,21 @@ const VIS_NETWORK_VERSION = '9.1.6';
 
 type Props = {
   containerStyle?: ViewStyle;
-  edges: { from: string; to: string }[];
-  nodes: { id: string }[];
+  data: {
+    edges: { from: string; to: string }[];
+    nodes: { id: string }[];
+  };
   options: any;
   style?: ViewStyle;
 };
 
 export default function VisNetwork({
   containerStyle,
-  edges,
-  nodes,
+  data,
   options,
   style,
 }: Props) {
+  const { edges, nodes } = data;
   const html = `
 <!DOCTYPE html>
 <html>
@@ -34,9 +36,9 @@ export default function VisNetwork({
     const nodes = new vis.DataSet(${JSON.stringify(nodes)});
     const edges = new vis.DataSet(${JSON.stringify(edges)});
     const container = document.getElementById('container');
-    const graph = { edges, nodes };
+    const data = { edges, nodes };
     const options = ${JSON.stringify(options)};
-    const network = new vis.Network(container, graph, options);
+    const network = new vis.Network(container, data, options);
     network.fit();
 </script>
 </body>
