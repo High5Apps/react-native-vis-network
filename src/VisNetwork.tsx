@@ -4,23 +4,26 @@ import { WebView } from 'react-native-webview';
 
 const VIS_NETWORK_VERSION = '9.1.6';
 
+type NodeId = number | string;
+
 type Props = {
   containerStyle?: ViewStyle;
   data: {
-    edges: { from: string; to: string }[];
-    nodes: { id: string }[];
+    edges: { from: NodeId; to: NodeId }[];
+    nodes: { id: NodeId; label?: string }[];
   };
-  options: any;
+  options?: any;
   style?: ViewStyle;
 };
 
 export default function VisNetwork({
   containerStyle,
   data,
-  options,
+  options: maybeOptions,
   style,
 }: Props) {
   const { edges, nodes } = data;
+  const options = maybeOptions ?? {};
   const html = `
 <!DOCTYPE html>
 <html>
