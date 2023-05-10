@@ -1,6 +1,6 @@
 {
   "name": "react-native-vis-network",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Use vis-network in your React Native projects",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
