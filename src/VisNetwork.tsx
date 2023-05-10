@@ -42,9 +42,9 @@ export default function VisNetwork({
     const data = { edges, nodes };
     const options = ${JSON.stringify(options)};
     const network = new vis.Network(container, data, options);
-    setTimeout(() => {
+    network.once('stabilized', () => {
       network.fit({ maxZoomLevel: 100 });
-    }, 10);
+    });
 </script>
 </body>
 </html>
