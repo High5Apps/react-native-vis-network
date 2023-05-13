@@ -2,16 +2,12 @@ import React, { useRef } from 'react';
 import type { ViewStyle } from 'react-native';
 import { WebView } from 'react-native-webview';
 import VisNetworkJS from './vis-network@9.1.6.min.js';
-
-type NodeId = number | string;
+import type { Data, Options } from './types';
 
 type Props = {
   containerStyle?: ViewStyle;
-  data: {
-    edges: { from: NodeId; to: NodeId }[];
-    nodes: { id: NodeId; label?: string }[];
-  };
-  options?: any;
+  data: Data;
+  options?: Options;
   style?: ViewStyle;
 };
 
