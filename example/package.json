@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@babel/preset-env": "^7.1.6",
     "@expo/webpack-config": "^18.0.1",
     "babel-loader": "^8.1.0",
     "babel-plugin-module-resolver": "^4.1.0"
