@@ -31,6 +31,11 @@ export default function VisNetwork({
 
   const webviewRef = useRef<WebView>(null);
 
+  // Must set an onMessage handler, even if it's a no-op, or else the
+  // injectedJavaScript won't be run on iOS. For more info, see:
+  // https://github.com/react-native-webview/react-native-webview/blob/master/docs/Reference.md#injectedjavascript
+  const onMessage = () => {};
+
   return (
     <WebView
       containerStyle={containerStyle}
@@ -50,6 +55,7 @@ export default function VisNetwork({
         `);
       }}
       originWhitelist={['*']}
+      onMessage={onMessage}
       ref={webviewRef}
       source={{ html }}
       style={style}
