@@ -57,6 +57,8 @@ export default function VisNetwork({
       originWhitelist={['*']}
       onMessage={onMessage}
       ref={webviewRef}
+      showsHorizontalScrollIndicator={false}
+      showsVerticalScrollIndicator={false}
       source={{ html }}
       style={style}
     />
