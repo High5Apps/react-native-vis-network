@@ -1,6 +1,6 @@
 {
   "name": "react-native-vis-network",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Use vis-network in your React Native projects",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -98,7 +98,10 @@
       "@commitlint/config-conventional"
     ],
     "rules": {
-      "body-max-line-length": [0, "always"]
+      "body-max-line-length": [
+        0,
+        "always"
+      ]
     }
   },
   "release-it": {
