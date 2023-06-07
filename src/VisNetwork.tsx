@@ -4,6 +4,16 @@ import { WebView } from 'react-native-webview';
 import VisNetworkJS from './vis-network@9.1.6.min.js';
 import type { Data, Options } from './types';
 
+const html = `
+<!DOCTYPE html>
+<html>
+<head></head>
+<body>
+  <div id="container" style="height: 100vh;"></div>
+</body>
+</html>
+`;
+
 type Props = {
   containerStyle?: ViewStyle;
   data: Data;
@@ -19,15 +29,6 @@ export default function VisNetwork({
 }: Props) {
   const { edges, nodes } = data;
   const options = maybeOptions ?? {};
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <head></head>
-    <body>
-      <div id="container" style="height: 100vh;"></div>
-    </body>
-    </html>
-  `;
 
   const webviewRef = useRef<WebView>(null);
 
