@@ -16,6 +16,8 @@
 //                 Slaven Tomac <https://github.com/slavede>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 
+import type { NativeEventSubscription } from 'react-native';
+
 export type IdType = string | number;
 export type DirectionType = 'from' | 'to';
 
@@ -637,7 +639,7 @@ export interface OptionsShadow {
   y?: number;
 }
 
-const visNetworkMessageTypes = ['onLoad'] as const;
+const visNetworkMessageTypes = ['onLoad', 'networkEventListener'] as const;
 type VisNetworkMessageType = (typeof visNetworkMessageTypes)[number];
 
 export type VisNetworkMessage = {
@@ -652,3 +654,34 @@ export function isVisNetworkMessage(
     message?.type?.length > 0 && visNetworkMessageTypes.includes(message.type)
   );
 }
+
+export type NetworkEventListenerMessage = VisNetworkMessage & {
+  eventName: NetworkEvents;
+  visNetworkCallbackId: string;
+};
+
+export function isNetworkEventListenerMessage(
+  object: unknown
+): object is NetworkEventListenerMessage {
+  const message = object as NetworkEventListenerMessage;
+  return (
+    isVisNetworkMessage(message) &&
+    typeof message.eventName === 'string' &&
+    message.eventName?.length > 0 &&
+    typeof message.visNetworkCallbackId === 'string' &&
+    message.visNetworkCallbackId.length > 0
+  );
+}
+
+export type EventCallback = (params?: any) => void;
+export type VisNetworkRef = {
+  /**
+   * Add an event listener
+   * Returns the NativeEventSubscription used to remove the event listener
+   * See https://visjs.github.io/vis-network/docs/network/#Events
+   */
+  addEventListener: (
+    eventName: NetworkEvents,
+    callback: EventCallback
+  ) => NativeEventSubscription;
+};
