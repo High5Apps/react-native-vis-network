@@ -636,3 +636,19 @@ export interface OptionsShadow {
   x?: number;
   y?: number;
 }
+
+const visNetworkMessageTypes = ['onLoad'] as const;
+type VisNetworkMessageType = (typeof visNetworkMessageTypes)[number];
+
+export type VisNetworkMessage = {
+  type: VisNetworkMessageType;
+};
+
+export function isVisNetworkMessage(
+  object: unknown
+): object is VisNetworkMessage {
+  const message = object as VisNetworkMessage;
+  return (
+    message?.type?.length > 0 && visNetworkMessageTypes.includes(message.type)
+  );
+}

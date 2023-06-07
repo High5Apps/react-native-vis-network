@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import type { ViewStyle } from 'react-native';
-import { WebView } from 'react-native-webview';
-import type { Data, Options } from './types';
+import { WebView, WebViewMessageEvent } from 'react-native-webview';
+import { Data, Options, VisNetworkMessage, isVisNetworkMessage } from './types';
 import VisNetworkJS from './vis-network@9.1.6.min.js';
 
 const html = `
@@ -17,6 +17,7 @@ const html = `
 type Props = {
   containerStyle?: ViewStyle;
   data: Data;
+  onLoad?: () => void;
   options?: Options;
   style?: ViewStyle;
 };
@@ -24,6 +25,7 @@ type Props = {
 export default function VisNetwork({
   containerStyle,
   data,
+  onLoad,
   options: maybeOptions,
   style,
 }: Props) {
@@ -31,11 +33,6 @@ export default function VisNetwork({
   const options = maybeOptions ?? {};
 
   const webviewRef = useRef<WebView>(null);
-
-  // Must set an onMessage handler, even if it's a no-op, or else the
-  // injectedJavaScript won't be run on iOS. For more info, see:
-  // https://github.com/react-native-webview/react-native-webview/blob/master/docs/Reference.md#injectedjavascript
-  const onMessage = () => {};
 
   return (
     <WebView
@@ -49,6 +46,11 @@ export default function VisNetwork({
           const data = { edges, nodes };
           const options = ${JSON.stringify(options)};
           const network = new vis.Network(container, data, options);
+
+          const onLoad = { type: 'onLoad' };
+          const onLoadMessage = JSON.stringify(onLoad);
+          window.ReactNativeWebView.postMessage(onLoadMessage);
+
           network.once('stabilized', () => {
             network.fit({ maxZoomLevel: 100 });
           });
@@ -56,7 +58,29 @@ export default function VisNetwork({
         `);
       }}
       originWhitelist={['*']}
-      onMessage={onMessage}
+      onMessage={(event: WebViewMessageEvent) => {
+        const { data: messageData } = event.nativeEvent;
+
+        let visNetworkMessage: VisNetworkMessage;
+        try {
+          const maybeVisNetworkMessage = JSON.parse(messageData);
+          if (!isVisNetworkMessage(maybeVisNetworkMessage)) {
+            console.warn(
+              `Unknown message from webview: ${maybeVisNetworkMessage}`
+            );
+            return;
+          }
+          visNetworkMessage = maybeVisNetworkMessage;
+        } catch {
+          console.warn(`Unable to parse message from webview: ${messageData}`);
+          return;
+        }
+
+        const { type } = visNetworkMessage;
+        if (type === 'onLoad') {
+          onLoad?.();
+        }
+      }}
       ref={webviewRef}
       showsHorizontalScrollIndicator={false}
       showsVerticalScrollIndicator={false}
