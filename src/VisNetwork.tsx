@@ -1,8 +1,8 @@
 import React, { useRef } from 'react';
 import type { ViewStyle } from 'react-native';
 import { WebView } from 'react-native-webview';
-import VisNetworkJS from './vis-network@9.1.6.min.js';
 import type { Data, Options } from './types';
+import VisNetworkJS from './vis-network@9.1.6.min.js';
 
 const html = `
 <!DOCTYPE html>
