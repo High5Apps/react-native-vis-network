@@ -46,6 +46,39 @@ export default function MyComponent() {
 }
 ```
 
+### Event Listeners
+You can add event listeners for any [vis-network Event](https://visjs.github.io/vis-network/docs/network/#Events).
+
+Note that the earliest time you can successfully add an event listener is during the `onLoad` callback. If you try to add an event listener before then your callback won't be called.
+
+```js
+  const [loading, setLoading] = useState<boolean>(false);
+  const visNetworkRef = useRef<VisNetworkRef>(null);
+
+  useEffect(() => {
+    if (!loading || !visNetworkRef.current) {
+      return;
+    }
+
+    const subscription = visNetworkRef.current.addEventListener(
+      'click',
+      (event: any) => console.log(JSON.stringify(event, null, 2))
+    );
+
+    return subscription.remove;
+  }, [loading]);
+
+  // ...
+
+  return (
+    <VisNetwork
+      data={data}
+      onLoad={() => setLoading(true)}
+      ref={visNetworkRef}
+    />
+  );
+```
+
 ## Contributing
 
 See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
