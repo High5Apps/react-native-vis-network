@@ -1,9 +1,32 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { StyleSheet, View } from 'react-native';
-import VisNetwork from 'react-native-vis-network';
+import VisNetwork, { VisNetworkRef } from 'react-native-vis-network';
 
 export default function App() {
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const visNetworkRef = useRef<VisNetworkRef>(null);
+
+  useEffect(() => {
+    if (!loading || !visNetworkRef.current) {
+      return;
+    }
+
+    const subscription = visNetworkRef.current.addEventListener(
+      'click',
+      (event: any) => console.log(JSON.stringify(event, null, 2))
+    );
+
+    return subscription.remove;
+
+    // Note the dependency on loading below. If you try to add an event listener
+    // on mount (i.e. dependency of []), the listener won't be registered
+    // correctly. That's because at mount time the webview's network hasn't been
+    // instantiated yet. onLoad is the earliest time at which listeners can be
+    // added successfully.
+  }, [loading]);
+
   // Create an array with nodes
   const nodes = [
     { id: 1, label: 'Node 1' },
@@ -27,7 +50,12 @@ export default function App() {
   return (
     <View style={styles.background}>
       <View style={styles.container}>
-        <VisNetwork containerStyle={styles.networkContainer} data={data} />
+        <VisNetwork
+          containerStyle={styles.networkContainer}
+          data={data}
+          onLoad={() => setLoading(true)}
+          ref={visNetworkRef}
+        />
       </View>
     </View>
   );
