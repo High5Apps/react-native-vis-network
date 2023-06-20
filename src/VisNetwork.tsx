@@ -4,7 +4,7 @@ import React, {
   useImperativeHandle,
   useRef,
 } from 'react';
-import type { ViewStyle } from 'react-native';
+import type { GestureResponderHandlers, ViewStyle } from 'react-native';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import {
   Data,
@@ -32,7 +32,7 @@ const getRandomCallbackId = () => Math.random().toString().slice(2);
 
 type CallbackCache = { [key: string]: EventCallback };
 
-type Props = {
+type Props = GestureResponderHandlers & {
   containerStyle?: ViewStyle;
   data: Data;
   onLoad?: () => void;
@@ -41,7 +41,14 @@ type Props = {
 };
 
 function VisNetwork(
-  { containerStyle, data, onLoad, options: maybeOptions, style }: Props,
+  {
+    containerStyle,
+    data,
+    onLoad,
+    options: maybeOptions,
+    style,
+    ...gestureResponderHandlers
+  }: Props,
   ref: ForwardedRef<VisNetworkRef>
 ) {
   const { edges, nodes } = data;
@@ -179,6 +186,7 @@ function VisNetwork(
       showsVerticalScrollIndicator={false}
       source={{ html }}
       style={style}
+      {...gestureResponderHandlers}
     />
   );
 }
