@@ -1,4 +1,4 @@
-import React, { ForwardedRef, forwardRef, useRef } from 'react';
+import React, { ForwardedRef, forwardRef, useEffect, useRef } from 'react';
 import type { GestureResponderHandlers, ViewStyle } from 'react-native';
 import { WebView } from 'react-native-webview';
 import type { CallbackCache, Data, Options, VisNetworkRef } from './types';
@@ -14,6 +14,19 @@ const html = `
   <div id="container" style="height: 100vh;"></div>
 </body>
 </html>
+`;
+
+const initializeNetworkJs = `
+  const nodes = new vis.DataSet([]);
+  const edges = new vis.DataSet([]);
+  const container = document.getElementById('container');
+  const data = { edges, nodes };
+  const options = {};
+  this.network = new vis.Network(container, data, options);
+
+  this.callbackCache = {}
+
+  true;
 `;
 
 type Props = GestureResponderHandlers & {
@@ -35,29 +48,43 @@ function VisNetwork(
   }: Props,
   ref: ForwardedRef<VisNetworkRef>
 ) {
-  const { edges, nodes } = data;
-  const options = maybeOptions ?? {};
-
   const webviewRef = useRef<WebView>(null);
   const callbackCacheRef = useRef<CallbackCache>({});
+  const loadedRef = useRef<boolean>(false);
 
   useVisNetworkRef(ref, webviewRef.current, callbackCacheRef.current);
 
-  const initializeNetworkJs = `
-    const nodes = new vis.DataSet(${JSON.stringify(nodes)});
-    const edges = new vis.DataSet(${JSON.stringify(edges)});
-    const container = document.getElementById('container');
-    const data = { edges, nodes };
-    const options = ${JSON.stringify(options)};
-    this.network = new vis.Network(container, data, options);
+  useEffect(() => {
+    if (!loadedRef.current) {
+      return;
+    }
 
-    this.callbackCache = {}
+    const { edges, nodes } = data;
+    webviewRef.current?.injectJavaScript(`
+      this.network.setData({
+        edges: new vis.DataSet(${JSON.stringify(edges)}),
+        nodes: new vis.DataSet(${JSON.stringify(nodes)}),
+      });
 
-    this.network.once('stabilized', () => {
-      this.network.fit({ maxZoomLevel: 100 });
-    });
-    true;
-  `;
+      this.network.once('stabilized', () => {
+        this.network.fit({ maxZoomLevel: 100 });
+      });
+
+      true;
+    `);
+  }, [data]);
+
+  useEffect(() => {
+    if (!loadedRef.current) {
+      return;
+    }
+
+    const options = maybeOptions ?? {};
+    webviewRef.current?.injectJavaScript(`
+      this.network.setOptions(${JSON.stringify(options)});
+      true;
+    `);
+  }, [maybeOptions]);
 
   const { handleMessage } = MessageHandler(callbackCacheRef.current);
 
@@ -65,7 +92,10 @@ function VisNetwork(
     <WebView
       containerStyle={containerStyle}
       injectedJavaScript={VisNetworkJS + initializeNetworkJs}
-      onLoad={onLoad}
+      onLoad={() => {
+        loadedRef.current = true;
+        onLoad?.();
+      }}
       originWhitelist={['*']}
       onMessage={handleMessage}
       ref={webviewRef}
