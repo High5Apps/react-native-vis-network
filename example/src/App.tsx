@@ -1,9 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { StyleSheet, View } from 'react-native';
-import VisNetwork, { VisNetworkRef } from 'react-native-vis-network';
+import { Button, StyleSheet, View } from 'react-native';
+import VisNetwork, { Data, VisNetworkRef } from 'react-native-vis-network';
 
 export default function App() {
+  const [edges, setEdges] = useState<Data['edges']>([
+    { from: 1, to: 3 },
+    { from: 1, to: 2 },
+    { from: 2, to: 4 },
+    { from: 2, to: 5 },
+    { from: 3, to: 3 },
+  ]);
   const [loading, setLoading] = useState<boolean>(false);
 
   const visNetworkRef = useRef<VisNetworkRef>(null);
@@ -36,15 +43,6 @@ export default function App() {
     { id: 5, label: 'Node 5' },
   ];
 
-  // Create an array with edges
-  const edges = [
-    { from: 1, to: 3 },
-    { from: 1, to: 2 },
-    { from: 2, to: 4 },
-    { from: 2, to: 5 },
-    { from: 3, to: 3 },
-  ];
-
   // Create a network
   const data = { edges, nodes };
   return (
@@ -57,6 +55,10 @@ export default function App() {
           ref={visNetworkRef}
         />
       </View>
+      <Button
+        title="Remove edge"
+        onPress={() => setEdges(edges?.slice(0, -1))}
+      />
     </View>
   );
 }
