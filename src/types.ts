@@ -639,23 +639,7 @@ export interface OptionsShadow {
   y?: number;
 }
 
-const visNetworkMessageTypes = ['onLoad', 'networkEventListener'] as const;
-type VisNetworkMessageType = (typeof visNetworkMessageTypes)[number];
-
-export type VisNetworkMessage = {
-  type: VisNetworkMessageType;
-};
-
-export function isVisNetworkMessage(
-  object: unknown
-): object is VisNetworkMessage {
-  const message = object as VisNetworkMessage;
-  return (
-    message?.type?.length > 0 && visNetworkMessageTypes.includes(message.type)
-  );
-}
-
-export type NetworkEventListenerMessage = VisNetworkMessage & {
+export type NetworkEventListenerMessage = {
   eventName: NetworkEvents;
   visNetworkCallbackId: string;
 };
@@ -665,7 +649,6 @@ export function isNetworkEventListenerMessage(
 ): object is NetworkEventListenerMessage {
   const message = object as NetworkEventListenerMessage;
   return (
-    isVisNetworkMessage(message) &&
     typeof message.eventName === 'string' &&
     message.eventName?.length > 0 &&
     typeof message.visNetworkCallbackId === 'string' &&

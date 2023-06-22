@@ -12,8 +12,6 @@ import {
   NetworkEvents,
   Options,
   VisNetworkRef,
-  VisNetworkMessage,
-  isVisNetworkMessage,
   isNetworkEventListenerMessage,
 } from './types';
 import VisNetworkJS from './vis-network@9.1.6.min.js';
@@ -116,70 +114,52 @@ function VisNetwork(
     [webviewRef]
   );
 
+  const initializeNetworkJs = `
+    const nodes = new vis.DataSet(${JSON.stringify(nodes)});
+    const edges = new vis.DataSet(${JSON.stringify(edges)});
+    const container = document.getElementById('container');
+    const data = { edges, nodes };
+    const options = ${JSON.stringify(options)};
+    this.network = new vis.Network(container, data, options);
+
+    this.callbackCache = {}
+
+    this.network.once('stabilized', () => {
+      this.network.fit({ maxZoomLevel: 100 });
+    });
+    true;
+  `;
+
   return (
     <WebView
       containerStyle={containerStyle}
-      injectedJavaScript={VisNetworkJS}
-      onLoad={() => {
-        webviewRef.current?.injectJavaScript(`
-          const nodes = new vis.DataSet(${JSON.stringify(nodes)});
-          const edges = new vis.DataSet(${JSON.stringify(edges)});
-          const container = document.getElementById('container');
-          const data = { edges, nodes };
-          const options = ${JSON.stringify(options)};
-          this.network = new vis.Network(container, data, options);
-
-          this.callbackCache = {}
-
-          const onLoad = { type: 'onLoad' };
-          const onLoadMessage = JSON.stringify(onLoad);
-          window.ReactNativeWebView.postMessage(onLoadMessage);
-
-          this.network.once('stabilized', () => {
-            this.network.fit({ maxZoomLevel: 100 });
-          });
-          true;
-        `);
-      }}
+      injectedJavaScript={VisNetworkJS + initializeNetworkJs}
+      onLoad={onLoad}
       originWhitelist={['*']}
       onMessage={(event: WebViewMessageEvent) => {
         const { data: messageData } = event.nativeEvent;
 
-        let visNetworkMessage: VisNetworkMessage;
+        let json: any;
         try {
-          const maybeVisNetworkMessage = JSON.parse(messageData);
-          if (!isVisNetworkMessage(maybeVisNetworkMessage)) {
-            console.warn(`Unknown message from webview: ${messageData}`);
-            return;
-          }
-          visNetworkMessage = maybeVisNetworkMessage;
+          json = JSON.parse(messageData);
         } catch {
           console.warn(`Unable to parse message from webview: ${messageData}`);
           return;
         }
 
-        const { type } = visNetworkMessage;
-        if (type === 'onLoad') {
-          onLoad?.();
-        } else if (type === 'networkEventListener') {
-          if (!isNetworkEventListenerMessage(visNetworkMessage)) {
-            console.warn(
-              `Unable to parse networkEventListener: ${messageData}`
-            );
-            return;
-          }
-
-          const { visNetworkCallbackId, ...visNetworkEvent } =
-            visNetworkMessage;
-
-          const callback = callbackCacheRef.current[visNetworkCallbackId];
-          if (!callback) {
-            console.warn(`No callback found with id: ${visNetworkCallbackId}`);
-            return;
-          }
-
-          callback(visNetworkEvent);
+        if (!isNetworkEventListenerMessage(json)) {
+          console.warn(`Unable to parse networkEventListener: ${messageData}`);
+          return;
         }
+
+        const { visNetworkCallbackId, ...visNetworkEvent } = json;
+        const callback = callbackCacheRef.current[visNetworkCallbackId];
+        if (!callback) {
+          console.warn(`No callback found with id: ${visNetworkCallbackId}`);
+          return;
+        }
+
+        callback(visNetworkEvent);
       }}
       ref={webviewRef}
       showsHorizontalScrollIndicator={false}
