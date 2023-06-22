@@ -46,14 +46,14 @@ export default function useVisNetworkRef(
             // "Can't create duplicate variable: 'handler'" error when adding
             // multiple listeners
             const handler${id} = (event) => {
-            const message = {
-                eventName: '${eventName}',
-                type: 'networkEventListener',
-                visNetworkCallbackId: '${id}',
-                ...event,
-            };
-            const stringifiedMessage = JSON.stringify(message);
-            window.ReactNativeWebView.postMessage(stringifiedMessage);
+              const message = {
+                  eventName: '${eventName}',
+                  type: 'networkEventListener',
+                  visNetworkCallbackId: '${id}',
+                  ...event,
+              };
+              const stringifiedMessage = JSON.stringify(message);
+              window.ReactNativeWebView.postMessage(stringifiedMessage);
             };
 
             this.callbackCache['${id}'] = handler${id}
