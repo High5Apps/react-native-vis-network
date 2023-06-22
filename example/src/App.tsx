@@ -12,6 +12,7 @@ export default function App() {
     { from: 3, to: 3 },
   ]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [zoomView, setZoomView] = useState<boolean>(true);
 
   const visNetworkRef = useRef<VisNetworkRef>(null);
 
@@ -52,12 +53,17 @@ export default function App() {
           containerStyle={styles.networkContainer}
           data={data}
           onLoad={() => setLoading(true)}
+          options={{ interaction: { zoomView } }}
           ref={visNetworkRef}
         />
       </View>
       <Button
         title="Remove edge"
         onPress={() => setEdges(edges?.slice(0, -1))}
+      />
+      <Button
+        title={zoomView ? 'Disable zoom' : 'Enable zoom'}
+        onPress={() => setZoomView(!zoomView)}
       />
     </View>
   );
