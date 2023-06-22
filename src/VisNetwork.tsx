@@ -5,16 +5,17 @@ import React, {
   useRef,
 } from 'react';
 import type { GestureResponderHandlers, ViewStyle } from 'react-native';
-import { WebView, WebViewMessageEvent } from 'react-native-webview';
-import {
+import { WebView } from 'react-native-webview';
+import type {
+  CallbackCache,
   Data,
   EventCallback,
   NetworkEvents,
   Options,
   VisNetworkRef,
-  isNetworkEventListenerMessage,
 } from './types';
 import VisNetworkJS from './vis-network@9.1.6.min.js';
+import MessageHandler from './MessageHandler';
 
 const html = `
 <!DOCTYPE html>
@@ -27,8 +28,6 @@ const html = `
 `;
 
 const getRandomCallbackId = () => Math.random().toString().slice(2);
-
-type CallbackCache = { [key: string]: EventCallback };
 
 type Props = GestureResponderHandlers & {
   containerStyle?: ViewStyle;
@@ -130,37 +129,15 @@ function VisNetwork(
     true;
   `;
 
+  const { handleMessage } = MessageHandler(callbackCacheRef.current);
+
   return (
     <WebView
       containerStyle={containerStyle}
       injectedJavaScript={VisNetworkJS + initializeNetworkJs}
       onLoad={onLoad}
       originWhitelist={['*']}
-      onMessage={(event: WebViewMessageEvent) => {
-        const { data: messageData } = event.nativeEvent;
-
-        let json: any;
-        try {
-          json = JSON.parse(messageData);
-        } catch {
-          console.warn(`Unable to parse message from webview: ${messageData}`);
-          return;
-        }
-
-        if (!isNetworkEventListenerMessage(json)) {
-          console.warn(`Unable to parse networkEventListener: ${messageData}`);
-          return;
-        }
-
-        const { visNetworkCallbackId, ...visNetworkEvent } = json;
-        const callback = callbackCacheRef.current[visNetworkCallbackId];
-        if (!callback) {
-          console.warn(`No callback found with id: ${visNetworkCallbackId}`);
-          return;
-        }
-
-        callback(visNetworkEvent);
-      }}
+      onMessage={handleMessage}
       ref={webviewRef}
       showsHorizontalScrollIndicator={false}
       showsVerticalScrollIndicator={false}

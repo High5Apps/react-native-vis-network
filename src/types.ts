@@ -657,6 +657,7 @@ export function isNetworkEventListenerMessage(
 }
 
 export type EventCallback = (params?: any) => void;
+export type CallbackCache = { [key: string]: EventCallback };
 export type VisNetworkRef = {
   /**
    * Add an event listener
