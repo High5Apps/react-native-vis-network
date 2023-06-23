@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { Button, StyleSheet, View } from 'react-native';
+import { Button, StyleSheet, Text, View } from 'react-native';
 import VisNetwork, { Data, VisNetworkRef } from 'react-native-vis-network';
 
 export default function App() {
@@ -12,6 +12,7 @@ export default function App() {
     { from: 3, to: 3 },
   ]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [selectedNodeId, setSelectedNodeId] = useState<string | undefined>();
   const [zoomView, setZoomView] = useState<boolean>(true);
 
   const visNetworkRef = useRef<VisNetworkRef>(null);
@@ -23,7 +24,7 @@ export default function App() {
 
     const subscription = visNetworkRef.current.addEventListener(
       'click',
-      (event: any) => console.log(JSON.stringify(event, null, 2))
+      ({ nodes }: any) => setSelectedNodeId(nodes[0])
     );
 
     return subscription.remove;
@@ -48,6 +49,9 @@ export default function App() {
   const data = { edges, nodes };
   return (
     <View style={styles.background}>
+      <Text style={styles.text}>
+        {selectedNodeId ? `Node ${selectedNodeId} clicked` : 'No node clicked'}
+      </Text>
       <View style={styles.container}>
         <VisNetwork
           containerStyle={styles.networkContainer}
@@ -75,6 +79,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 20,
+    rowGap: 5,
   },
   container: {
     aspectRatio: 1,
@@ -82,5 +87,9 @@ const styles = StyleSheet.create({
   networkContainer: {
     borderColor: 'blue',
     borderWidth: 1,
+  },
+  text: {
+    fontSize: 17,
+    textAlign: 'center',
   },
 });
