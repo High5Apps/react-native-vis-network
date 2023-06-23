@@ -42,10 +42,7 @@ export default function useVisNetworkRef(
           const id = cacheCallback(callback);
 
           webview?.injectJavaScript(`
-            // Need to add id suffix to handler variable name to prevent
-            // "Can't create duplicate variable: 'handler'" error when adding
-            // multiple listeners
-            const handler${id} = (event) => {
+            this.callbackCache['${id}'] = (event) => {
               const message = {
                   eventName: '${eventName}',
                   type: 'networkEventListener',
@@ -56,9 +53,8 @@ export default function useVisNetworkRef(
               window.ReactNativeWebView.postMessage(stringifiedMessage);
             };
 
-            this.callbackCache['${id}'] = handler${id}
+            this.network.on('${eventName}', this.callbackCache['${id}']);
 
-            this.network.on('${eventName}', handler${id});
             true;
           `);
 
