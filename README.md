@@ -2,7 +2,11 @@
 
 [react-native-vis-network](https://github.com/High5Apps/react-native-vis-network#readme) lets you use [vis-network](https://github.com/visjs/vis-network#readme) in your [React Native](https://reactnative.dev/) projects.
 
-![example chart](docs/images/example-network-on-ios.png)
+## iOS example
+<img src="docs/images/example-network-on-ios.png" width="175">
+
+## Android example
+<img src="docs/images/example-network-on-android.png" width="175">
 
 ## Installation
 
