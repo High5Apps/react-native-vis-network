@@ -1,4 +1,10 @@
-import React, { ForwardedRef, forwardRef, useEffect, useRef } from 'react';
+import React, {
+  ForwardedRef,
+  forwardRef,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import type { GestureResponderHandlers, ViewStyle } from 'react-native';
 import { WebView } from 'react-native-webview';
 import type { CallbackCache, Data, Options, VisNetworkRef } from './types';
@@ -50,12 +56,12 @@ function VisNetwork(
 ) {
   const webviewRef = useRef<WebView>(null);
   const callbackCacheRef = useRef<CallbackCache>({});
-  const loadedRef = useRef<boolean>(false);
+  const [loaded, setLoaded] = useState(false);
 
   useVisNetworkRef(ref, webviewRef.current, callbackCacheRef.current);
 
   useEffect(() => {
-    if (!loadedRef.current) {
+    if (!loaded) {
       return;
     }
 
@@ -72,10 +78,10 @@ function VisNetwork(
 
       true;
     `);
-  }, [data]);
+  }, [data, loaded]);
 
   useEffect(() => {
-    if (!loadedRef.current) {
+    if (!loaded) {
       return;
     }
 
@@ -84,7 +90,7 @@ function VisNetwork(
       this.network.setOptions(${JSON.stringify(options)});
       true;
     `);
-  }, [maybeOptions]);
+  }, [maybeOptions, loaded]);
 
   const { handleMessage } = MessageHandler(callbackCacheRef.current);
 
@@ -93,7 +99,7 @@ function VisNetwork(
       containerStyle={containerStyle}
       injectedJavaScript={VisNetworkJS + initializeNetworkJs}
       onLoad={() => {
-        loadedRef.current = true;
+        setLoaded(true);
         onLoad?.();
       }}
       originWhitelist={['*']}
