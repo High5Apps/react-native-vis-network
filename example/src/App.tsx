@@ -4,13 +4,22 @@ import { Button, StyleSheet, Text, View } from 'react-native';
 import VisNetwork, { Data, VisNetworkRef } from 'react-native-vis-network';
 
 export default function App() {
-  const [edges, setEdges] = useState<Data['edges']>([
-    { from: 1, to: 3 },
-    { from: 1, to: 2 },
-    { from: 2, to: 4 },
-    { from: 2, to: 5 },
-    { from: 3, to: 3 },
-  ]);
+  const [data, setData] = useState<Data>({
+    edges: [
+      { from: 1, to: 3 },
+      { from: 1, to: 2 },
+      { from: 2, to: 4 },
+      { from: 2, to: 5 },
+      { from: 3, to: 3 },
+    ],
+    nodes: [
+      { id: 1, label: 'Node 1' },
+      { id: 2, label: 'Node 2' },
+      { id: 3, label: 'Node 3' },
+      { id: 4, label: 'Node 4' },
+      { id: 5, label: 'Node 5' },
+    ],
+  });
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedNodeId, setSelectedNodeId] = useState<string | undefined>();
   const [zoomView, setZoomView] = useState<boolean>(true);
@@ -36,17 +45,6 @@ export default function App() {
     // added successfully.
   }, [loading]);
 
-  // Create an array with nodes
-  const nodes = [
-    { id: 1, label: 'Node 1' },
-    { id: 2, label: 'Node 2' },
-    { id: 3, label: 'Node 3' },
-    { id: 4, label: 'Node 4' },
-    { id: 5, label: 'Node 5' },
-  ];
-
-  // Create a network
-  const data = { edges, nodes };
   return (
     <View style={styles.background}>
       <Text style={styles.text}>
@@ -63,7 +61,11 @@ export default function App() {
       </View>
       <Button
         title="Remove edge"
-        onPress={() => setEdges(edges?.slice(0, -1))}
+        onPress={() => {
+          const updatedData = { ...data };
+          updatedData.edges = updatedData.edges?.slice(1);
+          setData(updatedData);
+        }}
       />
       <Button
         title={zoomView ? 'Disable zoom' : 'Enable zoom'}
