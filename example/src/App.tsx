@@ -21,6 +21,7 @@ export default function App() {
     ],
   });
   const [loading, setLoading] = useState<boolean>(false);
+  const [progress, setProgress] = useState(0);
   const [selectedNodeId, setSelectedNodeId] = useState<string | undefined>();
   const [zoomView, setZoomView] = useState<boolean>(true);
 
@@ -31,12 +32,26 @@ export default function App() {
       return;
     }
 
-    const subscription = visNetworkRef.current.addEventListener(
+    const clickSubscription = visNetworkRef.current.addEventListener(
       'click',
       ({ nodes }: any) => setSelectedNodeId(nodes[0])
     );
 
-    return subscription.remove;
+    const progressSubscription = visNetworkRef.current.addEventListener(
+      'stabilizationProgress',
+      ({ iterations, total }: any) => setProgress(iterations / total)
+    );
+
+    const doneSubscription = visNetworkRef.current.addEventListener(
+      'stabilizationIterationsDone',
+      () => setProgress(1)
+    );
+
+    return () => {
+      clickSubscription.remove();
+      progressSubscription.remove();
+      doneSubscription.remove();
+    };
 
     // Note the dependency on loading below. If you try to add an event listener
     // on mount (i.e. dependency of []), the listener won't be registered
@@ -47,6 +62,9 @@ export default function App() {
 
   return (
     <View style={styles.background}>
+      <Text style={styles.text}>
+        {`Loading progress: ${Math.round(100 * progress)}%`}
+      </Text>
       <Text style={styles.text}>
         {selectedNodeId ? `Node ${selectedNodeId} clicked` : 'No node clicked'}
       </Text>
