@@ -5,7 +5,12 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import type { GestureResponderHandlers, ViewStyle } from 'react-native';
+import {
+  View,
+  type GestureResponderHandlers,
+  type ViewStyle,
+  StyleSheet,
+} from 'react-native';
 import { WebView } from 'react-native-webview';
 import type { CallbackCache, Data, Options, VisNetworkRef } from './types';
 import VisNetworkJS from './vis-network@9.1.6.min.js';
@@ -95,23 +100,31 @@ function VisNetwork(
   const { handleMessage } = MessageHandler(callbackCacheRef.current);
 
   return (
-    <WebView
-      containerStyle={containerStyle}
-      injectedJavaScript={VisNetworkJS + initializeNetworkJs}
-      onLoad={() => {
-        setLoaded(true);
-        onLoad?.();
-      }}
-      originWhitelist={['*']}
-      onMessage={handleMessage}
-      ref={webviewRef}
-      showsHorizontalScrollIndicator={false}
-      showsVerticalScrollIndicator={false}
-      source={{ html }}
-      style={style}
-      {...gestureResponderHandlers}
-    />
+    <View renderToHardwareTextureAndroid style={styles.container}>
+      <WebView
+        containerStyle={containerStyle}
+        injectedJavaScript={VisNetworkJS + initializeNetworkJs}
+        onLoad={() => {
+          setLoaded(true);
+          onLoad?.();
+        }}
+        originWhitelist={['*']}
+        onMessage={handleMessage}
+        ref={webviewRef}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        source={{ html }}
+        style={style}
+        {...gestureResponderHandlers}
+      />
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
 
 export default forwardRef(VisNetwork);
