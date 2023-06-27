@@ -104,6 +104,7 @@ function VisNetwork(
       <WebView
         containerStyle={containerStyle}
         injectedJavaScript={VisNetworkJS + initializeNetworkJs}
+        nestedScrollEnabled
         onLoad={() => {
           setLoaded(true);
           onLoad?.();
