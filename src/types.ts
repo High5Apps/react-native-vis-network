@@ -656,6 +656,22 @@ export function isNetworkEventListenerMessage(
   );
 }
 
+export type NetworkMethodListenerMessage = {
+  result: string;
+  visNetworkCallbackId: string;
+};
+
+export function isNetworkMethodListenerMessage(
+  object: unknown
+): object is NetworkMethodListenerMessage {
+  const message = object as NetworkMethodListenerMessage;
+  return (
+    message.result !== undefined &&
+    typeof message.visNetworkCallbackId === 'string' &&
+    message.visNetworkCallbackId.length > 0
+  );
+}
+
 export type EventCallback = (params?: any) => void;
 export type CallbackCache = { [key: string]: EventCallback };
 export type VisNetworkRef = {
@@ -668,6 +684,22 @@ export type VisNetworkRef = {
     eventName: NetworkEvents,
     callback: EventCallback
   ) => NativeEventSubscription;
+
+  /**
+   * Returns the x y positions in canvas space of a requested node or array of nodes.
+   *
+   * @remarks
+   * - If `nodeIds` is supplied as a single id that does not correspond
+   * to a node in the network, this function will return an empty object.
+   * - If `nodeIds` is supplied as an array of ids, but one or more do not correspond to a node in the network, the
+   * returned object will *not* include entries for the non-existent node positions.
+   *
+   * @param nodeIds - Either an array of node ids or a single node id. If not supplied, all node ids in the network will be used.
+   * @returns A an object containing the x y positions in canvas space of the nodes in the network, keyed by id.
+   */
+  getPositions(
+    nodeIds?: IdType[] | IdType
+  ): Promise<{ [nodeId: string]: Position }>;
 
   /**
    * Zooms out so all nodes fit on the canvas.

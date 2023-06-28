@@ -1,5 +1,9 @@
 import type { WebViewMessageEvent } from 'react-native-webview';
-import { CallbackCache, isNetworkEventListenerMessage } from './types';
+import {
+  CallbackCache,
+  isNetworkEventListenerMessage,
+  isNetworkMethodListenerMessage,
+} from './types';
 
 export default function MessageHandler(callbackCache: CallbackCache) {
   return {
@@ -14,19 +18,22 @@ export default function MessageHandler(callbackCache: CallbackCache) {
         return;
       }
 
-      if (!isNetworkEventListenerMessage(json)) {
-        console.warn(`Unable to parse networkEventListener: ${messageData}`);
+      if (
+        !isNetworkEventListenerMessage(json) &&
+        !isNetworkMethodListenerMessage(json)
+      ) {
+        console.warn(`Unable to parse messageData: ${messageData}`);
         return;
       }
 
-      const { visNetworkCallbackId, ...visNetworkEvent } = json;
+      const { visNetworkCallbackId, ...rest } = json;
       const callback = callbackCache[visNetworkCallbackId];
       if (!callback) {
         console.warn(`No callback found with id: ${visNetworkCallbackId}`);
         return;
       }
 
-      callback(visNetworkEvent);
+      callback(rest);
     },
   };
 }

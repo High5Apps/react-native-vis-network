@@ -6,6 +6,7 @@ import type {
   FocusOptions,
   IdType,
   NetworkEvents,
+  Position,
   VisNetworkRef,
 } from './types';
 import type WebView from 'react-native-webview';
@@ -31,6 +32,38 @@ export default function useVisNetworkRef(
           this.network.${methodName}(...${JSON.stringify(params)});
           true;
         `);
+      }
+
+      function sendWithResult(
+        callback: EventCallback,
+        methodName: string,
+        params: any[]
+      ) {
+        const id = cacheCallback((result: any) => {
+          callback(result);
+          delete callbackCache[id];
+        });
+        const filteredParams = params.filter((p) => !!p);
+        const stringifiedParams = filteredParams.length
+          ? `...${JSON.stringify(params)}`
+          : '';
+        webview?.injectJavaScript(`
+          window.ReactNativeWebView.postMessage(JSON.stringify({
+            result: this.network.${methodName}(${stringifiedParams}),
+            visNetworkCallbackId: '${id}',
+          }));
+          true;
+        `);
+      }
+
+      async function sendWithResultAsync(
+        methodName: string,
+        ...params: any[]
+      ): Promise<any> {
+        const result = await new Promise((resolve) => {
+          sendWithResult(resolve, methodName, params);
+        });
+        return result;
       }
 
       function removeEventListener(
@@ -68,6 +101,11 @@ export default function useVisNetworkRef(
           `);
 
           return { remove: () => removeEventListener(eventName, id) };
+        },
+        async getPositions(
+          nodeIds?: IdType[] | IdType
+        ): Promise<{ [nodeId: string]: Position }> {
+          return sendWithResultAsync('getPositions', nodeIds);
         },
         fit(options?: FitOptions): void {
           send('fit', options);
