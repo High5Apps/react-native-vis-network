@@ -22,7 +22,7 @@ export default function App() {
   });
   const [loading, setLoading] = useState<boolean>(false);
   const [progress, setProgress] = useState(0);
-  const [selectedNodeId, setSelectedNodeId] = useState<string | undefined>();
+  const [selectedNodeId, setSelectedNodeId] = useState<number | undefined>();
   const [zoomView, setZoomView] = useState<boolean>(true);
 
   const visNetworkRef = useRef<VisNetworkRef>(null);
