@@ -2,6 +2,9 @@ import { ForwardedRef, useImperativeHandle } from 'react';
 import type {
   CallbackCache,
   EventCallback,
+  FitOptions,
+  FocusOptions,
+  IdType,
   NetworkEvents,
   VisNetworkRef,
 } from './types';
@@ -22,6 +25,13 @@ export default function useVisNetworkRef(
         callbackCache[id] = callback;
         return id;
       };
+
+      function send(methodName: string, ...params: any[]) {
+        webview?.injectJavaScript(`
+          this.network.${methodName}(...${JSON.stringify(params)});
+          true;
+        `);
+      }
 
       function removeEventListener(
         eventName: NetworkEvents,
@@ -59,6 +69,12 @@ export default function useVisNetworkRef(
           `);
 
           return { remove: () => removeEventListener(eventName, id) };
+        },
+        fit(options?: FitOptions): void {
+          send('fit', options);
+        },
+        focus(nodeId: IdType, options?: FocusOptions): void {
+          send('focus', nodeId, options);
         },
       };
     },

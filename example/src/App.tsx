@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Button, StyleSheet, Text, View } from 'react-native';
 import VisNetwork, { Data, VisNetworkRef } from 'react-native-vis-network';
@@ -20,6 +20,7 @@ export default function App() {
       { id: 5, label: 'Node 5' },
     ],
   });
+  const [focusedNodeId, setFocusedNodeId] = useState<number | undefined>();
   const [loading, setLoading] = useState<boolean>(false);
   const [progress, setProgress] = useState(0);
   const [selectedNodeId, setSelectedNodeId] = useState<number | undefined>();
@@ -60,6 +61,15 @@ export default function App() {
     // added successfully.
   }, [loading]);
 
+  const getRandomNodeId = useCallback(() => {
+    const { nodes } = data;
+    if (!nodes || !nodes.length) {
+      return undefined;
+    }
+    const randomIndex = Math.floor(Math.random() * nodes.length);
+    return nodes[randomIndex]?.id;
+  }, [data]);
+
   return (
     <View style={styles.background}>
       <Text style={styles.text}>
@@ -83,11 +93,30 @@ export default function App() {
           const updatedData = { ...data };
           updatedData.edges = updatedData.edges?.slice(1);
           setData(updatedData);
+
+          // This is needed because re-rendering the network automatically zooms
+          // out to fit the entire network
+          setFocusedNodeId(undefined);
         }}
       />
       <Button
         title={zoomView ? 'Disable zoom' : 'Enable zoom'}
         onPress={() => setZoomView(!zoomView)}
+      />
+      <Button
+        title={
+          focusedNodeId !== undefined ? 'Unfocus on node' : 'Focus on node'
+        }
+        onPress={() => {
+          if (focusedNodeId === undefined) {
+            const nodeId = getRandomNodeId() as number;
+            setFocusedNodeId(nodeId);
+            visNetworkRef.current?.focus(nodeId, { animation: true, scale: 5 });
+          } else {
+            setFocusedNodeId(undefined);
+            visNetworkRef.current?.fit({ animation: true, maxZoomLevel: 100 });
+          }
+        }}
       />
     </View>
   );

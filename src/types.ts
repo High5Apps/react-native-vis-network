@@ -668,4 +668,19 @@ export type VisNetworkRef = {
     eventName: NetworkEvents,
     callback: EventCallback
   ) => NativeEventSubscription;
+
+  /**
+   * Zooms out so all nodes fit on the canvas.
+   *
+   * @param [options] All options are optional for the fit method
+   */
+  fit(options?: FitOptions): void;
+
+  /**
+   * You can focus on a node with this function.
+   * What that means is the view will lock onto that node, if it is moving, the view will also move accordingly.
+   * If the view is dragged by the user, the focus is broken. You can supply options to customize the effect.
+   *
+   */
+  focus(nodeId: IdType, options?: FocusOptions): void;
 };
