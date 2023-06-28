@@ -55,7 +55,6 @@ export default function useVisNetworkRef(
             this.callbackCache['${id}'] = (event) => {
               const message = {
                   eventName: '${eventName}',
-                  type: 'networkEventListener',
                   visNetworkCallbackId: '${id}',
                   ...event,
               };
