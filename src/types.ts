@@ -657,7 +657,7 @@ export function isNetworkEventListenerMessage(
 }
 
 export type NetworkMethodListenerMessage = {
-  result: string;
+  result: any;
   visNetworkCallbackId: string;
 };
 
