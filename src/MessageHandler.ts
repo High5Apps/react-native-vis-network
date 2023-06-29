@@ -18,22 +18,22 @@ export default function MessageHandler(callbackCache: CallbackCache) {
         return;
       }
 
-      if (
-        !isNetworkEventListenerMessage(json) &&
-        !isNetworkMethodListenerMessage(json)
-      ) {
-        console.warn(`Unable to parse messageData: ${messageData}`);
-        return;
+      const { visNetworkCallbackId, ...rest } = json;
+      let payload: any;
+      if (isNetworkEventListenerMessage(json)) {
+        payload = rest;
+      } else if (isNetworkMethodListenerMessage(json)) {
+        const { result } = rest;
+        payload = result;
       }
 
-      const { visNetworkCallbackId, ...rest } = json;
       const callback = callbackCache[visNetworkCallbackId];
       if (!callback) {
         console.warn(`No callback found with id: ${visNetworkCallbackId}`);
         return;
       }
 
-      callback(rest);
+      callback(payload);
     },
   };
 }
