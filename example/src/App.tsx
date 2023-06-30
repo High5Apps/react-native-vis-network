@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Button, StyleSheet, Text, View } from 'react-native';
 import VisNetwork, { Data, VisNetworkRef } from 'react-native-vis-network';
+import getNearestNodeInfo from './NearestNode';
 
 export default function App() {
   const [data, setData] = useState<Data>({
@@ -22,6 +23,10 @@ export default function App() {
   });
   const [focusedNodeId, setFocusedNodeId] = useState<number | undefined>();
   const [loading, setLoading] = useState<boolean>(false);
+  const [nearestNodeDistance, setNearestNodeDistance] = useState<
+    number | undefined
+  >();
+  const [nearestNodeId, setNearestNodeId] = useState<string | undefined>();
   const [progress, setProgress] = useState(0);
   const [selectedNodeId, setSelectedNodeId] = useState<number | undefined>();
   const [zoomView, setZoomView] = useState<boolean>(true);
@@ -35,7 +40,22 @@ export default function App() {
 
     const clickSubscription = visNetworkRef.current.addEventListener(
       'click',
-      ({ nodes }: any) => setSelectedNodeId(nodes[0])
+      (event: any) => {
+        const {
+          nodes,
+          pointer: { canvas: canvasPointer },
+        } = event;
+        setSelectedNodeId(nodes[0]);
+
+        visNetworkRef.current?.getPositions().then((positions) => {
+          const { nearestDistance, nearestId } = getNearestNodeInfo(
+            canvasPointer,
+            positions
+          );
+          setNearestNodeId(nearestId);
+          setNearestNodeDistance(nearestDistance);
+        });
+      }
     );
 
     const progressSubscription = visNetworkRef.current.addEventListener(
@@ -70,14 +90,22 @@ export default function App() {
     return nodes[randomIndex]?.id;
   }, [data]);
 
+  let clickLabel = '';
+  if (selectedNodeId) {
+    clickLabel = `Node ${selectedNodeId} clicked`;
+  } else if (nearestNodeId && nearestNodeDistance) {
+    const roundedDistance = Math.round(nearestNodeDistance);
+    clickLabel = `Nearest node: ${nearestNodeId} (distance: ${roundedDistance})`;
+  } else {
+    clickLabel = 'No node clicked';
+  }
+
   return (
     <View style={styles.background}>
       <Text style={styles.text}>
         {`Loading progress: ${Math.round(100 * progress)}%`}
       </Text>
-      <Text style={styles.text}>
-        {selectedNodeId ? `Node ${selectedNodeId} clicked` : 'No node clicked'}
-      </Text>
+      <Text style={styles.text}>{clickLabel}</Text>
       <View style={styles.container}>
         <VisNetwork
           containerStyle={styles.networkContainer}
