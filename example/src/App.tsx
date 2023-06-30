@@ -146,13 +146,6 @@ export default function App() {
           }
         }}
       />
-      <Button
-        title="Log positions"
-        onPress={async () => {
-          const positions = await visNetworkRef.current?.getPositions();
-          console.log(JSON.stringify(positions, null, 2));
-        }}
-      />
     </View>
   );
 }
