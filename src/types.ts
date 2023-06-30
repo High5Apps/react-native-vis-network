@@ -296,7 +296,6 @@ export interface LocaleMessages {
   back: string;
   addNode: string;
   addEdge: string;
-  editNode: string;
   editEdge: string;
   addDescription: string;
   edgeDescription: string;
@@ -686,6 +685,37 @@ export type VisNetworkRef = {
   ) => NativeEventSubscription;
 
   /**
+   * Go into addEdge mode.
+   * The explaination from addNodeMode applies here as well.
+   */
+  addEdgeMode(): void;
+
+  /**
+   * 	Go into addNode mode. Having edit mode or manipulation enabled is not required.
+   * To get out of this mode, call disableEditMode().
+   * The callback functions defined in handlerFunctions still apply.
+   * To use these methods without having the manipulation GUI, make sure you set enabled to false.
+   */
+  addNodeMode(): void;
+
+  /**
+   * Delete selected.
+   * Having edit mode or manipulation enabled is not required.
+   */
+  deleteSelected(): void;
+
+  /**
+   * 	Remove the network from the DOM and remove all Hammer bindings and references.
+   */
+  destroy(): void;
+
+  /**
+   * Go into editEdge mode.
+   * The explaination from addNodeMode applies here as well.
+   */
+  editEdgeMode(): void;
+
+  /**
    * Returns the x y positions in canvas space of a requested node or array of nodes.
    *
    * @remarks
@@ -715,4 +745,103 @@ export type VisNetworkRef = {
    *
    */
   focus(nodeId: IdType, options?: FocusOptions): void;
+
+  /**
+   * You can use this to programatically move a node.
+   * The supplied x and y positions have to be in canvas space!
+   *
+   * @param nodeId the node that will be moved
+   * @param x new canvas space x position
+   * @param y new canvas space y position
+   */
+  moveNode(nodeId: IdType, x: number, y: number): void;
+
+  /**
+   * You can animate or move the camera using the moveTo method.
+   *
+   */
+  moveTo(options: MoveToOptions): void;
+
+  /**
+   * Redraw the network.
+   */
+  redraw(): void;
+
+  /**
+   * Programatically release the focussed node.
+   */
+  releaseNode(): void;
+
+  /**
+   * Selects the edges corresponding to the id's in the input array.
+   * This method unselects all other objects before selecting its own objects.
+   * Does not fire events.
+   *
+   */
+  selectEdges(edgeIds: IdType[]): void;
+
+  /**
+   * Selects the nodes corresponding to the id's in the input array.
+   * If highlightEdges is true or undefined, the neighbouring edges will also be selected.
+   * This method unselects all other objects before selecting its own objects. Does not fire events.
+   *
+   */
+  selectNodes(nodeIds: IdType[], highlightEdges?: boolean): void;
+
+  /**
+   * Override all the data in the network.
+   * If stabilization is enabled in the physics module,
+   * the network will stabilize again.
+   * This method is also performed when first initializing the network.
+   *
+   * @param data network data
+   */
+  setData(data: Data): void;
+
+  /**
+   * Set the options.
+   * All available options can be found in the modules above.
+   * Each module requires it's own container with the module name to contain its options.
+   *
+   * @param options network options
+   */
+  setOptions(options: Options): void;
+
+  /**
+   * Set the size of the canvas.
+   * This is automatically done on a window resize.
+   *
+   * @param width width in a common format, f.e. '100px'
+   * @param height height in a common format, f.e. '100px'
+   */
+  setSize(width: string, height: string): void;
+
+  /**
+   * You can manually call stabilize at any time.
+   * All the stabilization options above are used.
+   * You can optionally supply the number of iterations it should do.
+   *
+   * @param [iterations] the number of iterations it should do
+   */
+  stabilize(iterations?: number): void;
+
+  /**
+   * Start the physics simulation.
+   * This is normally done whenever needed and is only really useful
+   * if you stop the simulation yourself and wish to continue it afterwards.
+   */
+  startSimulation(): void;
+
+  /**
+   * This stops the physics simulation and triggers a stabilized event.
+   * Tt can be restarted by dragging a node,
+   * altering the dataset or calling startSimulation().
+   */
+  stopSimulation(): void;
+
+  /**
+   * Unselect all objects.
+   * Does not fire events.
+   */
+  unselectAll(): void;
 };

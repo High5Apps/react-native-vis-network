@@ -1,11 +1,14 @@
 import { ForwardedRef, useImperativeHandle } from 'react';
 import type {
   CallbackCache,
+  Data,
   EventCallback,
   FitOptions,
   FocusOptions,
   IdType,
+  MoveToOptions,
   NetworkEvents,
+  Options,
   Position,
   VisNetworkRef,
 } from './types';
@@ -102,6 +105,21 @@ export default function useVisNetworkRef(
 
           return { remove: () => removeEventListener(eventName, id) };
         },
+        addEdgeMode(): void {
+          send('addEdgeMode');
+        },
+        addNodeMode(): void {
+          send('addNodeMode');
+        },
+        deleteSelected(): void {
+          send('deleteSelected');
+        },
+        destroy(): void {
+          send('destroy');
+        },
+        editEdgeMode(): void {
+          send('editEdgeMode');
+        },
         async getPositions(
           nodeIds?: IdType[] | IdType
         ): Promise<{ [nodeId: string]: Position }> {
@@ -112,6 +130,45 @@ export default function useVisNetworkRef(
         },
         focus(nodeId: IdType, options?: FocusOptions): void {
           send('focus', nodeId, options);
+        },
+        moveNode(nodeId: IdType, x: number, y: number): void {
+          send('moveNode', nodeId, x, y);
+        },
+        moveTo(options: MoveToOptions): void {
+          send('moveTo', options);
+        },
+        redraw(): void {
+          send('redraw');
+        },
+        releaseNode(): void {
+          send('releaseNode');
+        },
+        selectEdges(edgeIds: IdType[]): void {
+          send('selectEdges', edgeIds);
+        },
+        selectNodes(nodeIds: IdType[], highlightEdges?: boolean): void {
+          send('selectNodes', nodeIds, highlightEdges);
+        },
+        setData(data: Data): void {
+          send('setData', data);
+        },
+        setOptions(options: Options): void {
+          send('setOptions', options);
+        },
+        setSize(width: string, height: string): void {
+          send('setSize', width, height);
+        },
+        stabilize(iterations?: number): void {
+          send('stabilize', iterations);
+        },
+        startSimulation(): void {
+          send('startSimulation');
+        },
+        stopSimulation(): void {
+          send('stopSimulation');
+        },
+        unselectAll(): void {
+          send('unselectAll');
         },
       };
     },
