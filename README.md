@@ -78,6 +78,49 @@ Note that the earliest time you can successfully add an event listener is during
   );
 ```
 
+### Methods
+You can use any of the [vis-network methods](https://visjs.github.io/vis-network/docs/network/#methods) that are not discussed in the caveats below.
+
+#### Caveats
+1. It's not possible to use the following methods due to their non-serializable parameters:
+    - [`cluster`](https://visjs.github.io/vis-network/docs/network/#methodClustering)
+    - [`clusterByConnection`](https://visjs.github.io/vis-network/docs/network/#methodClustering)
+    - [`clusterByHubsize`](https://visjs.github.io/vis-network/docs/network/#methodClustering)
+    - [`clusterOutliers`](https://visjs.github.io/vis-network/docs/network/#methodClustering)
+    - [`openCluster`](https://visjs.github.io/vis-network/docs/network/#methodClustering)
+    - [`updateClusteredNode`](https://visjs.github.io/vis-network/docs/network/#methodClustering)
+    - [`updateEdge`](https://visjs.github.io/vis-network/docs/network/#methodClustering)
+2. It's not possible to use the following methods due to various issues discussed in [87da46d](https://github.com/High5Apps/react-native-vis-network/commit/87da46d):
+    - [`disableEditMode`](https://visjs.github.io/vis-network/docs/network/#methodManipulation)
+    - [`editNode`](https://visjs.github.io/vis-network/docs/network/#methodManipulation)
+    - [`enableEditMode`](https://visjs.github.io/vis-network/docs/network/#methodManipulation)
+    - [`setSelection`](https://visjs.github.io/vis-network/docs/network/#methodSelection)
+    - [`storePositions`](https://visjs.github.io/vis-network/docs/network/#methodInformation)
+3. Intentionally, the methods [`on`](https://visjs.github.io/vis-network/docs/network/#methodGlobal), [`off`](https://visjs.github.io/vis-network/docs/network/#methodGlobal), and [`once`](https://visjs.github.io/vis-network/docs/network/#methodGlobal) have  not been implemented. Instead, use `addEventListener` as described in [Event Listeners](#event-listeners).
+4. While using methods like `addEdgeMode`, `addNodeMode`, `setData`, and `setOptions` will successfully update and re-render the network, they will not update the `data` or `options` props passed into `VisNetwork`. Using any of these methods will cause the props to become out-of-sync with what is actually displayed.
+
+#### Example
+```js
+  // ...
+
+  const visNetworkRef = useRef<VisNetworkRef>(null);
+
+  // ...
+
+  return (
+    <>
+      <VisNetwork data={data} ref={visNetworkRef} />
+      <Button
+        title="Focus on node 1"
+        onPress={() => {
+          const nodeId = 1;
+          visNetworkRef.current?.focus(nodeId, { animation: true, scale: 5 });
+        }}
+      />
+    </>
+  );
+```
+
 ## Contributing
 
 See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
