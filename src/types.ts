@@ -699,6 +699,16 @@ export type VisNetworkRef = {
   addNodeMode(): void;
 
   /**
+   * This function converts canvas coordinates to coordinates on the DOM.
+   * Input and output are in the form of {x:Number, y:Number} (IPosition interface).
+   * The DOM values are relative to the network container.
+   *
+   * @param position the canvas coordinates
+   * @returns the DOM coordinates
+   */
+  canvasToDOM(position: Position): Promise<Position>;
+
+  /**
    * Delete selected.
    * Having edit mode or manipulation enabled is not required.
    */
@@ -710,10 +720,130 @@ export type VisNetworkRef = {
   destroy(): void;
 
   /**
+   * This function converts DOM coordinates to coordinates on the canvas.
+   * Input and output are in the form of {x:Number,y:Number} (IPosition interface).
+   * The DOM values are relative to the network container.
+   *
+   * @param position the DOM coordinates
+   * @returns the canvas coordinates
+   */
+  DOMtoCanvas(position: Position): Promise<Position>;
+
+  /**
    * Go into editEdge mode.
    * The explaination from addNodeMode applies here as well.
    */
   editEdgeMode(): void;
+
+  /**
+   * Nodes can be in clusters.
+   * Clusters can also be in clusters.
+   * This function returns an array of nodeIds showing where the node is.
+   *
+   * Example:
+   * cluster 'A' contains cluster 'B', cluster 'B' contains cluster 'C',
+   * cluster 'C' contains node 'fred'.
+   *
+   * network.clustering.findNode('fred') will return ['A','B','C','fred'].
+   *
+   * @param nodeId the node id.
+   * @returns an array of nodeIds showing where the node is
+   */
+  findNode(nodeId: IdType): Promise<IdType[]>;
+
+  /**
+   * When a clusteredEdgeId is available, this method will return the original
+   * baseEdgeId provided in data.edges ie.
+   * After clustering the 'SelectEdge' event is fired but provides only the clustered edge.
+   * This method can then be used to return the baseEdgeId.
+   */
+  getBaseEdge(clusteredEdgeId: IdType): Promise<IdType>;
+
+  /**
+   * For the given clusteredEdgeId, this method will return all the original
+   * base edge id's provided in data.edges.
+   * For a non-clustered (i.e. 'base') edge, clusteredEdgeId is returned.
+   * Only the base edge id's are returned.
+   * All clustered edges id's under clusteredEdgeId are skipped,
+   * but scanned recursively to return their base id's.
+   */
+  getBaseEdges(clusteredEdgeId: IdType): Promise<IdType[]>;
+
+  /**
+   * Returns a bounding box for the node including label.
+   *
+   */
+  getBoundingBox(nodeId: IdType): Promise<BoundingBox>;
+
+  /**
+   * Similar to findNode in that it returns all the edge ids that were
+   * created from the provided edge during clustering.
+   *
+   * @param baseEdgeId the base edge id
+   * @returns an array of edgeIds
+   */
+  getClusteredEdges(baseEdgeId: IdType): Promise<IdType[]>;
+
+  /**
+   * Returns an array of edgeIds of the edges connected to this node.
+   *
+   * @param nodeId the node id
+   */
+  getConnectedEdges(nodeId: IdType): Promise<IdType[]>;
+
+  /**
+   * Returns an array of nodeIds of the all the nodes that are directly connected to this node.
+   * If you supply an edgeId, vis will first match the id to nodes.
+   * If no match is found, it will search in the edgelist and return an array: [fromId, toId].
+   *
+   * @param nodeOrEdgeId a node or edge id
+   */
+  getConnectedNodes(
+    nodeOrEdgeId: IdType,
+    direction?: DirectionType
+  ): Promise<IdType[] | Array<{ fromId: IdType; toId: IdType }>>;
+
+  /**
+   * Returns a edgeId or undefined.
+   * The DOM positions are expected to be in pixels from the top left corner of the canvas.
+   *
+   */
+  getEdgeAt(position: Position): Promise<IdType>;
+
+  /**
+   * Returns a nodeId or undefined.
+   * The DOM positions are expected to be in pixels from the top left corner of the canvas.
+   *
+   */
+  getNodeAt(position: Position): Promise<IdType>;
+
+  /**
+   * Returns an array of all nodeIds of the nodes that
+   * would be released if you open the cluster.
+   *
+   * @param clusterNodeId the id of the cluster node
+   */
+  getNodesInCluster(clusterNodeId: IdType): Promise<IdType[]>;
+
+  /**
+   * If you use the configurator, you can call this method to get an options object that contains
+   * all differences from the default options caused by users interacting with the configurator.
+   *
+   */
+  getOptionsFromConfigurator(): Promise<any>;
+
+  /**
+   * Retrieves the x y position of a specific id.
+   *
+   * @param id - a node id
+   * @returns the x y position in canvas space of the requested node.
+   *
+   * @throws {@link TypeError}
+   *  Thrown if an undefined or null id is provided as a parameter.
+   * @throws {@link ReferenceError}
+   *  Thrown if the id provided as a parameter does not correspond to a node in the network.
+   */
+  getPosition(nodeId: IdType): Promise<Position>;
 
   /**
    * Returns the x y positions in canvas space of a requested node or array of nodes.
@@ -732,6 +862,50 @@ export type VisNetworkRef = {
   ): Promise<{ [nodeId: string]: Position }>;
 
   /**
+   * Returns the current scale of the network.
+   * 1.0 is comparible to 100%, 0 is zoomed out infinitely.
+   *
+   * @returns the current scale of the network
+   */
+  getScale(): Promise<number>;
+
+  /**
+   * If you like the layout of your network
+   * and would like it to start in the same way next time,
+   * ask for the seed using this method and put it in the layout.randomSeed option.
+   *
+   * @returns the current seed of the network.
+   */
+  getSeed(): Promise<number | string>;
+
+  /**
+   * Returns an array of selected edge ids like so:
+   * [edgeId1, edgeId2, ..].
+   *
+   */
+  getSelectedEdges(): Promise<IdType[]>;
+
+  /**
+   * Returns an array of selected node ids like so:
+   * [nodeId1, nodeId2, ..].
+   *
+   */
+  getSelectedNodes(): Promise<IdType[]>;
+
+  /**
+   * Returns an object with selected nodes and edges ids.
+   *
+   */
+  getSelection(): Promise<{ nodes: IdType[]; edges: IdType[] }>;
+
+  /**
+   * Returns the current central focus point of the view in the form: { x: {Number}, y: {Number} }
+   *
+   * @returns the view position;
+   */
+  getViewPosition(): Promise<Position>;
+
+  /**
    * Zooms out so all nodes fit on the canvas.
    *
    * @param [options] All options are optional for the fit method
@@ -745,6 +919,13 @@ export type VisNetworkRef = {
    *
    */
   focus(nodeId: IdType, options?: FocusOptions): void;
+
+  /**
+   * Returns true if the node whose ID has been supplied is a cluster.
+   *
+   * @param nodeId the node id.
+   */
+  isCluster(nodeId: IdType): Promise<boolean>;
 
   /**
    * You can use this to programatically move a node.

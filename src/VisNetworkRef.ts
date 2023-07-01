@@ -1,7 +1,9 @@
 import { ForwardedRef, useImperativeHandle } from 'react';
 import type {
+  BoundingBox,
   CallbackCache,
   Data,
+  DirectionType,
   EventCallback,
   FitOptions,
   FocusOptions,
@@ -111,25 +113,95 @@ export default function useVisNetworkRef(
         addNodeMode(): void {
           send('addNodeMode');
         },
+        async canvasToDOM(position: Position): Promise<Position> {
+          return sendWithResultAsync('canvasToDOM', position);
+        },
         deleteSelected(): void {
           send('deleteSelected');
         },
         destroy(): void {
           send('destroy');
         },
+        async DOMtoCanvas(position: Position): Promise<Position> {
+          return sendWithResultAsync('DOMtoCanvas', position);
+        },
         editEdgeMode(): void {
           send('editEdgeMode');
+        },
+        async findNode(nodeId: IdType): Promise<IdType[]> {
+          return sendWithResultAsync('findNode', nodeId);
+        },
+        async getBaseEdge(clusteredEdgeId: IdType): Promise<IdType> {
+          return sendWithResultAsync('getBaseEdge', clusteredEdgeId);
+        },
+        async getBaseEdges(clusteredEdgeId: IdType): Promise<IdType[]> {
+          return sendWithResultAsync('getBaseEdges', clusteredEdgeId);
+        },
+        async getBoundingBox(nodeId: IdType): Promise<BoundingBox> {
+          return sendWithResultAsync('getBoundingBox', nodeId);
+        },
+        async getClusteredEdges(baseEdgeId: IdType): Promise<IdType[]> {
+          return sendWithResultAsync('getClusteredEdges', baseEdgeId);
+        },
+        async getConnectedEdges(nodeId: IdType): Promise<IdType[]> {
+          return sendWithResultAsync('getConnectedEdges', nodeId);
+        },
+        async getConnectedNodes(
+          nodeOrEdgeId: IdType,
+          direction?: DirectionType
+        ): Promise<IdType[] | Array<{ fromId: IdType; toId: IdType }>> {
+          return sendWithResultAsync(
+            'getConnectedNodes',
+            nodeOrEdgeId,
+            direction
+          );
+        },
+        async getEdgeAt(position: Position): Promise<IdType> {
+          return sendWithResultAsync('getEdgeAt', position);
+        },
+        async getNodeAt(position: Position): Promise<IdType> {
+          return sendWithResultAsync('getNodeAt', position);
+        },
+        async getNodesInCluster(clusterNodeId: IdType): Promise<IdType[]> {
+          return sendWithResultAsync('getNodesInCluster', clusterNodeId);
+        },
+        async getOptionsFromConfigurator(): Promise<any> {
+          return sendWithResultAsync('getOptionsFromConfigurator');
+        },
+        async getPosition(nodeId: IdType): Promise<Position> {
+          return sendWithResultAsync('getPosition', nodeId);
         },
         async getPositions(
           nodeIds?: IdType[] | IdType
         ): Promise<{ [nodeId: string]: Position }> {
           return sendWithResultAsync('getPositions', nodeIds);
         },
+        async getScale(): Promise<number> {
+          return sendWithResultAsync('getScale');
+        },
+        async getSeed(): Promise<number | string> {
+          return sendWithResultAsync('getSeed');
+        },
+        async getSelectedEdges(): Promise<IdType[]> {
+          return sendWithResultAsync('getSelectedEdges');
+        },
+        async getSelectedNodes(): Promise<IdType[]> {
+          return sendWithResultAsync('getSelectedNodes');
+        },
+        async getSelection(): Promise<{ nodes: IdType[]; edges: IdType[] }> {
+          return sendWithResultAsync('getSelection');
+        },
+        async getViewPosition(): Promise<Position> {
+          return sendWithResultAsync('getViewPosition');
+        },
         fit(options?: FitOptions): void {
           send('fit', options);
         },
         focus(nodeId: IdType, options?: FocusOptions): void {
           send('focus', nodeId, options);
+        },
+        async isCluster(nodeId: IdType): Promise<boolean> {
+          return sendWithResultAsync('isCluster', nodeId);
         },
         moveNode(nodeId: IdType, x: number, y: number): void {
           send('moveNode', nodeId, x, y);
