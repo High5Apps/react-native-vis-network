@@ -51,6 +51,7 @@ You can add event listeners for any [vis-network Event](https://visjs.github.io/
 Note that the earliest time you can successfully add an event listener is during the `onLoad` callback. If you try to add an event listener before then your callback won't be called.
 
 ```js
+export default function MyComponent() {
   const [loading, setLoading] = useState<boolean>(false);
   const visNetworkRef = useRef<VisNetworkRef>(null);
 
@@ -76,6 +77,7 @@ Note that the earliest time you can successfully add an event listener is during
       ref={visNetworkRef}
     />
   );
+}
 ```
 
 ### Methods
@@ -101,8 +103,7 @@ You can use any of the [vis-network methods](https://visjs.github.io/vis-network
 
 #### Example
 ```js
-  // ...
-
+export default function MyComponent() {
   const visNetworkRef = useRef<VisNetworkRef>(null);
 
   // ...
@@ -119,6 +120,7 @@ You can use any of the [vis-network methods](https://visjs.github.io/vis-network
       />
     </>
   );
+}
 ```
 
 ### Options
@@ -126,9 +128,6 @@ You can use any of the [vis-network options](https://visjs.github.io/vis-network
 
 #### Example
 ```js
-import React, { useState } from 'react';
-import VisNetwork, { Options } from 'react-native-vis-network';
-
 export default function MyComponent() {
   const [options, setOptions] = useState<Options>({
     edges: {
