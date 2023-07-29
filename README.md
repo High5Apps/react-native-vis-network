@@ -121,6 +121,36 @@ You can use any of the [vis-network methods](https://visjs.github.io/vis-network
   );
 ```
 
+### Options
+You can use any of the [vis-network options](https://visjs.github.io/vis-network/docs/network/#options) that are serializable as [JSON](https://en.wikipedia.org/wiki/JSON) (i.e. not functions or callbacks).
+
+#### Example
+```js
+import React, { useState } from 'react';
+import VisNetwork, { Options } from 'react-native-vis-network';
+
+export default function MyComponent() {
+  const [options, setOptions] = useState<Options>({
+    edges: {
+      color: 'blue',
+      width: 2,
+    },
+    interaction: {
+      dragNodes: false,
+      keyboard: false,
+    },
+    nodes: {
+      borderWidth: 4,
+      color: 'pink',
+    },
+  });
+
+  // ...
+
+  return <VisNetwork data={data} options={options} />;
+}
+```
+
 ## Contributing
 
 See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
