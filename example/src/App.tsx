@@ -1,7 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Button, StyleSheet, Text, View } from 'react-native';
-import VisNetwork, { Data, VisNetworkRef } from 'react-native-vis-network';
+import VisNetwork, {
+  Data,
+  Options,
+  VisNetworkRef,
+} from 'react-native-vis-network';
 import getNearestNodeInfo from './NearestNode';
 
 export default function App() {
@@ -27,9 +31,12 @@ export default function App() {
     number | undefined
   >();
   const [nearestNodeId, setNearestNodeId] = useState<string | undefined>();
+  const [options, setOptions] = useState<Options>({
+    interaction: { zoomView: true },
+  });
   const [progress, setProgress] = useState(0);
   const [selectedNodeId, setSelectedNodeId] = useState<number | undefined>();
-  const [zoomView, setZoomView] = useState<boolean>(true);
+  const { zoomView } = options.interaction;
 
   const visNetworkRef = useRef<VisNetworkRef>(null);
 
@@ -111,7 +118,7 @@ export default function App() {
           containerStyle={styles.networkContainer}
           data={data}
           onLoad={() => setLoading(true)}
-          options={{ interaction: { zoomView } }}
+          options={options}
           ref={visNetworkRef}
         />
       </View>
@@ -129,7 +136,11 @@ export default function App() {
       />
       <Button
         title={zoomView ? 'Disable zoom' : 'Enable zoom'}
-        onPress={() => setZoomView(!zoomView)}
+        onPress={() => {
+          const updatedOptions = { ...options };
+          updatedOptions.interaction.zoomView = !zoomView;
+          setOptions(updatedOptions);
+        }}
       />
       <Button
         title={
