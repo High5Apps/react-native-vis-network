@@ -46,6 +46,7 @@ type Props = GestureResponderHandlers & {
   onLoad?: () => void;
   options?: Options;
   style?: ViewStyle;
+  zoomFitOnStabilized?: boolean;
 };
 
 function VisNetwork(
@@ -55,6 +56,7 @@ function VisNetwork(
     onLoad,
     options: maybeOptions,
     style,
+    zoomFitOnStabilized: maybeZoomFitOnStabilized,
     ...gestureResponderHandlers
   }: Props,
   ref: ForwardedRef<VisNetworkRef>
@@ -71,19 +73,22 @@ function VisNetwork(
     }
 
     const { edges, nodes } = data;
+    const zoomFitOnStabilized = maybeZoomFitOnStabilized ?? true;
     webviewRef.current?.injectJavaScript(`
       this.network.setData({
         edges: new vis.DataSet(${JSON.stringify(edges)}),
         nodes: new vis.DataSet(${JSON.stringify(nodes)}),
       });
 
-      this.network.once('stabilized', () => {
-        this.network.fit({ maxZoomLevel: 100 });
-      });
+      if (${zoomFitOnStabilized}) {
+        this.network.once('stabilized', () => {
+          this.network.fit({ maxZoomLevel: 100 });
+        });
+      }
 
       true;
     `);
-  }, [data, loaded]);
+  }, [data, loaded, maybeZoomFitOnStabilized]);
 
   useEffect(() => {
     if (!loaded) {
