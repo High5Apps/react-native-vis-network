@@ -150,6 +150,14 @@ export default function MyComponent() {
 }
 ```
 
+### Additional Options
+In addition to the vis-network options mentioned in the [Options](#options) section, the following props are also available.
+
+#### `zoomFitOnStabilized`
+- If `true`, the network is zoomed in or out to fill its container.
+- If `false`, nothing is done. As a result, nodes may be smaller than expected.
+- Default value: `true`
+
 ## Contributing
 
 See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
