@@ -1,10 +1,4 @@
-import React, {
-  ForwardedRef,
-  forwardRef,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { ForwardedRef, forwardRef, useRef, useState } from 'react';
 import {
   View,
   type GestureResponderHandlers,
@@ -17,6 +11,7 @@ import VisNetworkJS from './vis-network@9.1.6.min.js';
 import useDataReloader from './DataReloader';
 import useMessageHandler from './MessageHandler';
 import useVisNetworkRef from './VisNetworkRef';
+import useOptionsReloader from './OptionsReloader';
 
 const html = `
 <!DOCTYPE html>
@@ -68,18 +63,7 @@ function VisNetwork(
 
   useVisNetworkRef(ref, webviewRef, callbackCacheRef);
   useDataReloader(webviewRef, loaded, data, maybeZoomFitOnStabilized);
-
-  useEffect(() => {
-    if (!loaded) {
-      return;
-    }
-
-    const options = maybeOptions ?? {};
-    webviewRef.current?.injectJavaScript(`
-      this.network.setOptions(${JSON.stringify(options)});
-      true;
-    `);
-  }, [maybeOptions, loaded]);
+  useOptionsReloader(webviewRef, loaded, maybeOptions);
 
   const { handleMessage } = useMessageHandler(callbackCacheRef);
 
