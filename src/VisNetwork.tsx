@@ -14,6 +14,7 @@ import {
 import { WebView } from 'react-native-webview';
 import type { CallbackCache, Data, Options, VisNetworkRef } from './types';
 import VisNetworkJS from './vis-network@9.1.6.min.js';
+import useDataReloader from './DataReloader';
 import useMessageHandler from './MessageHandler';
 import useVisNetworkRef from './VisNetworkRef';
 
@@ -66,29 +67,7 @@ function VisNetwork(
   const [loaded, setLoaded] = useState(false);
 
   useVisNetworkRef(ref, webviewRef, callbackCacheRef);
-
-  useEffect(() => {
-    if (!loaded) {
-      return;
-    }
-
-    const { edges, nodes } = data;
-    const zoomFitOnStabilized = maybeZoomFitOnStabilized ?? true;
-    webviewRef.current?.injectJavaScript(`
-      this.network.setData({
-        edges: new vis.DataSet(${JSON.stringify(edges)}),
-        nodes: new vis.DataSet(${JSON.stringify(nodes)}),
-      });
-
-      if (${zoomFitOnStabilized}) {
-        this.network.once('stabilized', () => {
-          this.network.fit({ maxZoomLevel: 100 });
-        });
-      }
-
-      true;
-    `);
-  }, [data, loaded, maybeZoomFitOnStabilized]);
+  useDataReloader(webviewRef, loaded, data, maybeZoomFitOnStabilized);
 
   useEffect(() => {
     if (!loaded) {
