@@ -14,7 +14,7 @@ import {
 import { WebView } from 'react-native-webview';
 import type { CallbackCache, Data, Options, VisNetworkRef } from './types';
 import VisNetworkJS from './vis-network@9.1.6.min.js';
-import MessageHandler from './MessageHandler';
+import useMessageHandler from './MessageHandler';
 import useVisNetworkRef from './VisNetworkRef';
 
 const html = `
@@ -102,7 +102,7 @@ function VisNetwork(
     `);
   }, [maybeOptions, loaded]);
 
-  const { handleMessage } = MessageHandler(callbackCacheRef.current);
+  const { handleMessage } = useMessageHandler(callbackCacheRef);
 
   return (
     <View renderToHardwareTextureAndroid style={styles.container}>
