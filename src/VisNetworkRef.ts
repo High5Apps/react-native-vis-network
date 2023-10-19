@@ -1,4 +1,4 @@
-import { ForwardedRef, useImperativeHandle } from 'react';
+import { ForwardedRef, RefObject, useImperativeHandle } from 'react';
 import type {
   BoundingBox,
   CallbackCache,
@@ -19,13 +19,20 @@ import type WebView from 'react-native-webview';
 const getRandomCallbackId = () => Math.random().toString().slice(2);
 
 export default function useVisNetworkRef(
-  ref: ForwardedRef<VisNetworkRef>,
-  webview: WebView | null,
-  callbackCache: CallbackCache
+  ref: ForwardedRef<VisNetworkRef | null>,
+  webviewRef: RefObject<WebView | null>,
+  callbackCacheRef: RefObject<CallbackCache>
 ) {
-  useImperativeHandle(
+  useImperativeHandle<VisNetworkRef | null, VisNetworkRef | null>(
     ref,
     () => {
+      if (!webviewRef.current || !callbackCacheRef.current) {
+        return null;
+      }
+
+      const webview = webviewRef.current;
+      const callbackCache = callbackCacheRef.current;
+
       const cacheCallback = (callback: EventCallback) => {
         const id = getRandomCallbackId();
         callbackCache[id] = callback;
@@ -244,6 +251,6 @@ export default function useVisNetworkRef(
         },
       };
     },
-    [callbackCache, webview]
+    [callbackCacheRef, webviewRef]
   );
 }

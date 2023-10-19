@@ -65,7 +65,7 @@ function VisNetwork(
   const callbackCacheRef = useRef<CallbackCache>({});
   const [loaded, setLoaded] = useState(false);
 
-  useVisNetworkRef(ref, webviewRef.current, callbackCacheRef.current);
+  useVisNetworkRef(ref, webviewRef, callbackCacheRef);
 
   useEffect(() => {
     if (!loaded) {
