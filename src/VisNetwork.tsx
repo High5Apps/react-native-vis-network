@@ -62,8 +62,8 @@ function VisNetwork(
   const [loaded, setLoaded] = useState(false);
 
   useVisNetworkRef(ref, webviewRef, callbackCacheRef);
-  useDataReloader(webviewRef, loaded, data, maybeZoomFitOnStabilized);
   useOptionsReloader(webviewRef, loaded, maybeOptions);
+  useDataReloader(webviewRef, loaded, data, maybeZoomFitOnStabilized);
 
   const { handleMessage } = useMessageHandler(callbackCacheRef);
 
