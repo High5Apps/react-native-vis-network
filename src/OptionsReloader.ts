@@ -1,8 +1,21 @@
 import { useEffect, type RefObject } from 'react';
 import type WebView from 'react-native-webview';
-import type { ChosenLabelValues, ChosenNodeValues, Options } from './types';
+import type {
+  ChosenEdgeValues,
+  ChosenLabelValues,
+  ChosenNodeValues,
+  EdgeChosen,
+  EdgeOptions,
+  NodeChosen,
+  NodeOptions,
+  Options,
+} from './types';
 
 type ChosenStringProps =
+  | {
+      chosenValues: Partial<ChosenEdgeValues> | boolean;
+      key: 'edge';
+    }
   | {
       chosenValues: Partial<ChosenNodeValues> | boolean;
       key: 'node';
@@ -21,37 +34,54 @@ function getChosenString({ chosenValues, key }: ChosenStringProps) {
     },`;
 }
 
+type EdgesOrNodesStringProps =
+  | {
+      key: 'edges';
+      keyOptions: EdgeOptions;
+    }
+  | {
+      key: 'nodes';
+      keyOptions: NodeOptions;
+    };
+function getEdgesOrNodesString({ key, keyOptions }: EdgesOrNodesStringProps) {
+  const { chosen, ...staticKeyChosen } = keyOptions;
+  return `${key}: {
+    ...${JSON.stringify(staticKeyChosen)},
+    ${
+      typeof chosen === 'undefined'
+        ? ''
+        : `chosen: ${
+            typeof chosen === 'boolean'
+              ? chosen
+              : `{
+                ...${JSON.stringify(chosen)},
+                ${
+                  key === 'edges'
+                    ? getChosenString({
+                        chosenValues: (chosen as EdgeChosen).edge,
+                        key: 'edge',
+                      })
+                    : getChosenString({
+                        chosenValues: (chosen as NodeChosen).node,
+                        key: 'node',
+                      })
+                }
+                ${getChosenString({
+                  chosenValues: chosen.label,
+                  key: 'label',
+                })}
+              },`
+          }`
+    }
+  },`;
+}
+
 export function getOptionsString(options?: Options) {
-  const { nodes, ...staticOptions } = options ?? {};
-  const { chosen: nodesChosen, ...staticNodeChosen } = nodes ?? {};
+  const { edges, nodes, ...staticOptions } = options ?? {};
   return `{
     ${!staticOptions ? '' : '...' + JSON.stringify(staticOptions) + ','}
-    ${
-      !nodes
-        ? ''
-        : `nodes: {
-          ...${JSON.stringify(staticNodeChosen)},
-          ${
-            typeof nodesChosen === 'undefined'
-              ? ''
-              : `chosen: ${
-                  typeof nodesChosen === 'boolean'
-                    ? nodesChosen
-                    : `{
-                      ...${JSON.stringify(nodesChosen)},
-                      ${getChosenString({
-                        chosenValues: nodesChosen.node,
-                        key: 'node',
-                      })}
-                      ${getChosenString({
-                        chosenValues: nodesChosen.label,
-                        key: 'label',
-                      })}
-                    },`
-                }`
-          }
-        },`
-    }
+    ${!edges ? '' : getEdgesOrNodesString({ key: 'edges', keyOptions: edges })}
+    ${!nodes ? '' : getEdgesOrNodesString({ key: 'nodes', keyOptions: nodes })}
   }`.replace(/\s+/g, ' ');
 }
 

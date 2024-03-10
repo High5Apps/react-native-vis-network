@@ -33,6 +33,12 @@ export default function App() {
   const [nearestNodeId, setNearestNodeId] = useState<string | undefined>();
 
   const [options, setOptions] = useState<Options>({
+    edges: {
+      chosen: {
+        edge: { width: 3 },
+        label: false,
+      },
+    },
     nodes: {
       chosen: {
         label: {

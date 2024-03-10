@@ -496,6 +496,38 @@ export interface NodeOptions {
   y?: number;
 }
 
+type ArrowType = 'arrow' | 'bar' | 'circle' | 'image';
+
+export interface ChosenEdgeValues {
+  dashes: boolean | number[];
+  toArrow: boolean;
+  toArrowScale: number;
+  toArrowType: ArrowType;
+  middleArrow: boolean;
+  middleArrowScale: number;
+  middleArrowType: ArrowType;
+  fromArrow: boolean;
+  fromArrowScale: number;
+  fromArrowType: ArrowType;
+  arrowStrikethrough: boolean;
+  color: string;
+  inheritsColor: string | boolean;
+  opacity: number;
+  hidden: boolean;
+  length: number;
+  shadow: boolean | OptionsShadow;
+  shadowColor: string;
+  shadowSize: number;
+  shadowX: number;
+  shadowY: number;
+  width: number;
+}
+
+export interface EdgeChosen {
+  edge: boolean | Partial<ChosenEdgeValues>;
+  label: boolean | Partial<ChosenLabelValues>;
+}
+
 export interface EdgeOptions {
   arrows?:
     | string
@@ -507,12 +539,7 @@ export interface EdgeOptions {
 
   arrowStrikethrough?: boolean;
 
-  chosen?:
-    | boolean
-    | {
-        edge?: boolean; // please note, chosen.edge could be also a function. This case is not represented here
-        label?: boolean; // please note, chosen.label could be also a function. This case is not represented here
-      };
+  chosen?: boolean | EdgeChosen;
 
   color?:
     | string
