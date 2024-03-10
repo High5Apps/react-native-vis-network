@@ -404,8 +404,8 @@ export type NodeChosenNodeFunction = (
 ) => void;
 
 export interface NodeChosen {
-  node: boolean | NodeChosenNodeFunction;
-  label: boolean | NodeChosenLabelFunction;
+  node: boolean | Partial<ChosenNodeValues>;
+  label: boolean | Partial<ChosenLabelValues>;
 }
 
 export interface NodeOptions {

@@ -31,9 +31,32 @@ export default function App() {
     number | undefined
   >();
   const [nearestNodeId, setNearestNodeId] = useState<string | undefined>();
+
   const [options, setOptions] = useState<Options>({
+    nodes: {
+      chosen: {
+        label: {
+          color: 'blue',
+          face: 'serif',
+          size: 24,
+        },
+        node: {
+          borderColor: 'blue',
+          borderWidth: 10,
+          color: 'white',
+          shadowSize: 50,
+          shadowX: 25,
+          shadowY: 25,
+        },
+      },
+      color: {
+        background: 'white',
+        border: 'blue',
+      },
+    },
     interaction: { zoomView: true },
   });
+
   const [progress, setProgress] = useState(0);
   const [selectedNodeId, setSelectedNodeId] = useState<number | undefined>();
   const { zoomView } = options.interaction;
